@@ -22,6 +22,15 @@ abstract final class AbodeColors {
   /// sits on, so the model reads as printed on the card rather than framed in
   /// a video window.
   static const viewport = surface;
+
+  /// Backdrop for the interior walkthrough — a shade deeper than [canvas] so
+  /// the white walls still read against it.
+  ///
+  /// Deliberately light rather than near-black: native Liquid Glass takes its
+  /// brightness from whatever sits behind it, so a dark scene turned the HUD
+  /// glass dark and swallowed its text. Keeping the scene light keeps the
+  /// glass light, and it suits the editorial palette better than a void.
+  static const interiorBackdrop = Color(0xFFEDEAE3);
 }
 
 abstract final class AbodeSpace {

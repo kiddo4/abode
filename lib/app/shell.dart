@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:real_liquid_glass/real_liquid_glass.dart';
 
 import '../features/discover/discover_page.dart';
 import '../features/saved/saved_page.dart';
 import 'theme.dart';
 
-/// Holds the two tabs behind the floating glass bar.
+/// Holds the two tabs under a floating glass bar.
 ///
-/// The glass chrome is the only place liquid glass appears — it needs content
-/// moving underneath it to refract, and keeping it to the bar leaves the 3D as
-/// the subject rather than competing with it.
+/// On iOS 26+ the bar hosts Apple's native `UIGlassEffect`, so it refracts the
+/// real content behind it rather than approximating the material in a shader.
+/// It has to float over the content in a [Stack] for that to mean anything —
+/// glass with nothing behind it is just a grey rectangle.
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
@@ -22,28 +23,48 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
-    // Wraps the whole scaffold, not just the body: the tab bar's own labels
-    // sit outside `body` and would otherwise keep the debug underline.
-    return Material(
-      type: MaterialType.transparency,
-      child: GlassScaffold(
-        backgroundColor: AbodeColors.canvas,
-        body: IndexedStack(
-          index: _index,
-          children: const [DiscoverPage(), SavedPage()],
-        ),
-        bottomBar: GlassTabBar.bottom(
-          selectedIndex: _index,
-          onTabSelected: (i) => setState(() => _index = i),
-          selectedIconColor: AbodeColors.ink,
-          unselectedIconColor: AbodeColors.inkTertiary,
-          selectedLabelColor: AbodeColors.ink,
-          unselectedLabelColor: AbodeColors.inkTertiary,
-          tabs: const [
-            GlassTab(icon: Icon(Icons.explore_outlined), label: 'Discover'),
-            GlassTab(icon: Icon(Icons.bookmark_border_rounded), label: 'Saved'),
-          ],
-        ),
+    return Scaffold(
+      backgroundColor: AbodeColors.canvas,
+      // The bar overlays the body rather than insetting it, so listings scroll
+      // under the glass.
+      extendBody: true,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: IndexedStack(
+              index: _index,
+              children: const [DiscoverPage(), SavedPage()],
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SafeArea(
+              top: false,
+              child: LiquidGlassBottomBar(
+                currentIndex: _index,
+                onTap: (i) => setState(() => _index = i),
+                tint: AbodeColors.ink,
+                margin: const EdgeInsets.symmetric(horizontal: AbodeSpace.md),
+                items: const [
+                  LiquidGlassBarItem(
+                    icon: Icons.explore_outlined,
+                    selectedIcon: Icons.explore,
+                    sfSymbol: 'safari',
+                    selectedSfSymbol: 'safari.fill',
+                    label: 'Discover',
+                  ),
+                  LiquidGlassBarItem(
+                    icon: Icons.bookmark_border_rounded,
+                    selectedIcon: Icons.bookmark_rounded,
+                    sfSymbol: 'bookmark',
+                    selectedSfSymbol: 'bookmark.fill',
+                    label: 'Saved',
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

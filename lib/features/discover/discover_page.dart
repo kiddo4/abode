@@ -58,7 +58,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                     AbodeSpace.md,
                     AbodeSpace.sm,
                     AbodeSpace.md,
-                    100,
+                    118,
                   ),
                   child: _ListingCard(
                     listing: mockListings[i],
@@ -75,7 +75,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
               Positioned(
                 right: 9,
                 top: 0,
-                bottom: 100,
+                bottom: 118,
                 child: Center(
                   child: FeedIndicator(
                     count: mockListings.length,

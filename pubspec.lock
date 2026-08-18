@@ -65,14 +65,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.20.0"
-  equatable:
-    dependency: transitive
-    description:
-      name: equatable
-      sha256: "3bce007a596ff8b3119c45d68aaef631272537c03d30e5d4534dd24bf4c5eaa2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
   fake_async:
     dependency: transitive
     description:
@@ -107,14 +99,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
-  flutter_shaders:
-    dependency: transitive
-    description:
-      name: flutter_shaders
-      sha256: "34794acadd8275d971e02df03afee3dee0f98dbfb8c4837082ad0034f612a3e2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -167,14 +151,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.0"
-  liquid_glass_widgets:
-    dependency: "direct main"
-    description:
-      name: liquid_glass_widgets
-      sha256: "1ab08c58880c5866b467f511fad399f2b9d9873019807f840cc1453627959d1e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.29.7"
   logging:
     dependency: transitive
     description:
@@ -223,6 +199,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  real_liquid_glass:
+    dependency: "direct main"
+    description:
+      name: real_liquid_glass
+      sha256: "07f97c760eb1593ff050fd79b58e91e4e1e0d9135c89b1dcf0ee1941e4e22f11"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
   record_use:
     dependency: transitive
     description:
@@ -318,4 +302,4 @@ packages:
     version: "3.1.3"
 sdks:
   dart: ">=3.14.0-110.0.dev <4.0.0"
-  flutter: ">=3.41.0"
+  flutter: ">=3.27.0"

@@ -47,8 +47,21 @@ pieces are placed at native scale and eye height is derived from that same
 proportion rather than from metres.
 
 **Design.** Editorial and deliberately gradient-free: depth comes from
-whitespace, hairline rules, and the liquid-glass chrome floating above the 3D.
-All tokens live in `lib/app/theme.dart`; the accent is a single colour.
+whitespace, hairline rules, and the glass chrome floating above the 3D. All
+tokens live in `lib/app/theme.dart`; the accent is a single colour, spent only
+on the save control.
+
+**Glass is real, not simulated.** Chrome uses
+[`real_liquid_glass`](https://github.com/kiddo4/real_liquid_glass), which hosts
+Apple's native `UIGlassEffect` on iOS 26+, so the tab bar and the walkthrough
+HUD refract actual content behind them. Glass is used only where something is
+moving underneath — the bar over a scrolling feed, the HUD over a live 3D room.
+The detail page's "Step inside" button sits on a solid footer and is drawn
+solid, because glass over a flat colour is just a grey rectangle.
+
+Because native glass takes its brightness from whatever is behind it, HUD
+content is inked rather than white: these interiors are light, and white washed
+out against them.
 
 ## Assets
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glint_engine/glint_engine.dart';
+import 'package:real_liquid_glass/real_liquid_glass.dart';
 
 import '../../app/theme.dart';
 import '../../data/interior/layout.dart';
@@ -66,7 +67,7 @@ class _InteriorPageState extends State<InteriorPage> {
     );
 
     return Scaffold(
-      backgroundColor: AbodeColors.ink,
+      backgroundColor: AbodeColors.interiorBackdrop,
       body: Stack(
         children: [
           Positioned.fill(
@@ -78,11 +79,11 @@ class _InteriorPageState extends State<InteriorPage> {
                 width: width,
                 height: height,
                 environmentAsset: 'assets/hdri/studio_small_09_1k.hdr',
-                backgroundColor: const Color(0xFF11110E),
+                backgroundColor: AbodeColors.interiorBackdrop,
                 lightDirection: const Vector3(0.35, -1, -0.45),
                 lightIntensity: 2.2,
                 ambientIntensity: 0.42,
-                fogColor: const Color(0xFF11110E),
+                fogColor: AbodeColors.interiorBackdrop,
                 fogDistance: 34,
                 showStats: _showStats,
                 fallback: const _GpuUnavailable(),
@@ -120,14 +121,14 @@ class _GpuUnavailable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const ColoredBox(
-    color: AbodeColors.ink,
+    color: AbodeColors.interiorBackdrop,
     child: Center(
       child: Padding(
         padding: EdgeInsets.all(AbodeSpace.xl),
         child: Text(
           'Flutter GPU is unavailable on this device.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white70, fontFamily: AbodeType.body),
+          style: AbodeType.bodyText,
         ),
       ),
     ),
@@ -159,13 +160,21 @@ class _TopBar extends StatelessWidget {
           children: [
             _GlassCircleButton(icon: Icons.close_rounded, onTap: onClose),
             const SizedBox(width: AbodeSpace.md),
-            Expanded(
-              child: Text(
-                title,
-                style: AbodeType.title.copyWith(color: Colors.white),
-                overflow: TextOverflow.ellipsis,
+            Flexible(
+              child: LiquidGlassContainer(
+                shape: const LiquidGlassShape.capsule(),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                child: Text(
+                  title,
+                  style: AbodeType.title.copyWith(color: AbodeColors.ink),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
+            const Spacer(),
             _GlassCircleButton(
               icon: Icons.speed_rounded,
               active: statsOn,
@@ -191,19 +200,20 @@ class _GlassCircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return LiquidGlassContainer(
       onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: active
-              ? AbodeColors.accent.withValues(alpha: 0.9)
-              : Colors.white.withValues(alpha: 0.14),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
-        ),
-        child: Icon(icon, size: 19, color: Colors.white),
+      width: 42,
+      height: 42,
+      shape: const LiquidGlassShape.capsule(),
+      style: LiquidGlassStyle.regular,
+      // LiquidGlassContainer does not centre its child by default, so with an
+      // explicit width/height the icon otherwise sits in the top-left corner.
+      alignment: Alignment.center,
+      tint: active ? AbodeColors.accent : null,
+      child: Icon(
+        icon,
+        size: 19,
+        color: active ? Colors.white : AbodeColors.ink,
       ),
     );
   }
@@ -226,22 +236,27 @@ class _RoomBar extends StatelessWidget {
       alignment: Alignment.bottomCenter,
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.only(bottom: AbodeSpace.lg),
+          padding: const EdgeInsets.only(bottom: AbodeSpace.md),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: AbodeSpace.md),
-            child: Row(
-              children: [
-                for (var i = 0; i < waypoints.length; i++) ...[
-                  _RoomChip(
-                    label: waypoints[i].name,
-                    selected: controller.currentIndex == i,
-                    onTap: () => onSelect(i),
-                  ),
-                  if (i != waypoints.length - 1)
-                    const SizedBox(width: AbodeSpace.sm),
+            // One glass surface for the whole rail: a container per chip would
+            // mean a native platform view per chip, layered over a live 3D
+            // viewport.
+            child: LiquidGlassContainer(
+              shape: const LiquidGlassShape.capsule(),
+              padding: const EdgeInsets.all(5),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (var i = 0; i < waypoints.length; i++)
+                    _RoomChip(
+                      label: waypoints[i].name,
+                      selected: controller.currentIndex == i,
+                      onTap: () => onSelect(i),
+                    ),
                 ],
-              ],
+              ),
             ),
           ),
         ),
@@ -250,6 +265,8 @@ class _RoomBar extends StatelessWidget {
   }
 }
 
+/// Drawn inside the rail's glass, so the selected state is an opaque pill on
+/// the material rather than a second sheet of glass on top of it.
 class _RoomChip extends StatelessWidget {
   const _RoomChip({
     required this.label,
@@ -265,22 +282,23 @@ class _RoomChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AbodeRadius.chip),
-          color: selected ? Colors.white : Colors.white.withValues(alpha: 0.13),
-          border: Border.all(
-            color: selected
-                ? Colors.white
-                : Colors.white.withValues(alpha: 0.22),
-          ),
+          color: selected ? Colors.white : Colors.transparent,
         ),
         child: Text(
           label,
           style: AbodeType.label.copyWith(
-            color: selected ? AbodeColors.ink : Colors.white,
+            // Ink rather than white: the glass takes its brightness from the
+            // room behind it, and these interiors are light.
+            color: selected
+                ? AbodeColors.ink
+                : AbodeColors.ink.withValues(alpha: 0.62),
             fontWeight: FontWeight.w600,
           ),
         ),
